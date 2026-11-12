@@ -1,0 +1,23 @@
+# Keep the build context small and prevent host state from entering the image.
+node_modules
+dist
+coverage
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+*.log
+*.tsbuildinfo
+.vscode
+.idea
+.DS_Store
+docs/*.local.md
+test
+vitest.config.ts
+vitest.live.config.ts
+eslint.config.js
+.prettierrc.json
+.prettierignore
+Dockerfile
+.dockerignore
