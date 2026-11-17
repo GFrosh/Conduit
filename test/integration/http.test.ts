@@ -117,6 +117,19 @@ describe('POST /v1/process — success paths', () => {
     expect(body.meta.attempts).toHaveLength(1);
   });
 
+  it('does not treat a normally completed socket request as a client disconnect', async () => {
+    const { app } = await start();
+    const address = await app.listen({ host: '127.0.0.1', port: 0 });
+    const response = await fetch(`${address}/v1/process`, {
+      method: 'POST',
+      headers: { ...AUTH_HEADER, 'content-type': 'application/json' },
+      body: JSON.stringify(VALID_BODY),
+    });
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ success: true });
+  });
+
   it('honours an explicit provider and model', async () => {
     const { app } = await start();
     const response = await app.inject({

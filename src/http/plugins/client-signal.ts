@@ -10,20 +10,18 @@ declare module 'fastify' {
 /**
  * Client-disconnect propagation.
  *
- * Uses the raw socket's `close` event because `request.raw.on('aborted')` is
- * deprecated and does not fire for every HTTP/2 or keep-alive teardown. The
- * listener is removed on response completion to avoid retaining the request.
+ * Uses the request's `aborted` event so a normally completed request body is
+ * not mistaken for a disconnected client. The listener is removed on response
+ * completion to avoid retaining the request.
  */
 export function registerClientSignal(app: FastifyInstance): void {
   app.addHook('onRequest', async (request, reply) => {
     const controller = new AbortController();
     request.clientSignal = controller.signal;
 
-    const onClose = (): void => {
-      if (!reply.raw.writableEnded) controller.abort();
-    };
-    request.raw.once('close', onClose);
+    const onAborted = (): void => controller.abort();
+    request.raw.once('aborted', onAborted);
 
-    reply.raw.once('finish', () => request.raw.off('close', onClose));
+    reply.raw.once('finish', () => request.raw.off('aborted', onAborted));
   });
 }

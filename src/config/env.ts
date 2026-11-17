@@ -36,10 +36,13 @@ const optionalTrimmed = z
     return trimmed && trimmed.length > 0 ? trimmed : undefined;
   });
 
-const optionalBooleanString = z
-  .enum(['true', 'false'])
-  .optional()
-  .transform((value) => (value === undefined ? undefined : value === 'true'));
+const optionalBooleanString = z.preprocess(
+  (value) => (typeof value === 'string' && value.trim().length === 0 ? undefined : value),
+  z
+    .enum(['true', 'false'])
+    .optional()
+    .transform((value) => (value === undefined ? undefined : value === 'true')),
+);
 
 const optionalNumber = z
   .string()
